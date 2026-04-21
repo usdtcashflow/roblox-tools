@@ -2,11 +2,10 @@ import json
 import os
 
 DEFAULT_CONFIG = {
-    'username': 'guest',
-    'password': '',
-    'game_id': 0,
-    'server_region': 'US',
-    'debug_mode': False
+    'username': 'player',
+    'game_id': 123456,
+    'timeout': 30,
+    'debug': False
 }
 
 class ConfigLoader:
@@ -18,15 +17,19 @@ class ConfigLoader:
         if os.path.exists(self.config_file):
             with open(self.config_file, 'r') as file:
                 try:
-                    config_data = json.load(file)
-                    return {**DEFAULT_CONFIG, **config_data}
+                    user_config = json.load(file)
+                    return {**DEFAULT_CONFIG, **user_config}
                 except json.JSONDecodeError:
-                    print('Error decoding JSON, using defaults.')
-        return DEFAULT_CONFIG
+                    print('Error: Invalid JSON format in config file.')
+                    return DEFAULT_CONFIG
+        else:
+            print('Warning: Config file not found. Using default configuration.')
+            return DEFAULT_CONFIG
 
-    def get_config(self):
-        return self.config
+    def get(self, key, default=None):
+        return self.config.get(key, default)
 
+# Example usage
 if __name__ == '__main__':
-    loader = ConfigLoader()
-    print(loader.get_config())
+    config_loader = ConfigLoader()
+    print(config_loader.config)
