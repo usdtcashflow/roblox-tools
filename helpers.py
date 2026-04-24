@@ -1,44 +1,54 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 
-
-def calculate_average(scores: List[int]) -> float:
+def convert_to_dict(list_of_tuples: List[tuple]) -> List[Dict[str, Any]]:
     """
-    Calculate the average of a list of scores.
+    Convert a list of tuples into a list of dictionaries.
 
-    Parameters:
-        scores (List[int]): A list of integer scores.
+    Args:
+        list_of_tuples (List[tuple]): A list where each tuple contains key-value pairs.
 
     Returns:
-        float: The average of the scores, or 0.0 if the list is empty.
-    """    
-    if not scores:
+        List[Dict[str, Any]]: A list of dictionaries translated from the tuple pairs.
+    """
+    return [{str(tup[0]): tup[1] for tup in list_of_tuples}]
+
+
+def calculate_average(numbers: List[float]) -> float:
+    """
+    Calculate the average of a list of numbers.
+
+    Args:
+        numbers (List[float]): A list of numeric values.
+
+    Returns:
+        float: The average of the numbers.
+    """
+    if not numbers:
         return 0.0
-    return sum(scores) / len(scores)
+    return sum(numbers) / len(numbers)
 
 
-def format_scoreboard(scores: Dict[str, int]) -> str:
+def is_user_admin(user_roles: List[str]) -> bool:
     """
-    Format a scoreboard from a dictionary of player scores.
+    Check if a user has admin rights based on their roles.
 
-    Parameters:
-        scores (Dict[str, int]): A dictionary where keys are player names and values are scores.
+    Args:
+        user_roles (List[str]): A list of roles assigned to the user.
 
     Returns:
-        str: A formatted string displaying the scores of all players.
-    """    
-    formatted_scores = [f'{player}: {score}' for player, score in scores.items()]
-    return '\n'.join(formatted_scores)
-
-
-def is_valid_score(score: int) -> bool:
+        bool: True if the user has admin rights, False otherwise.
     """
-    Check if the given score is valid (between 0 and 100).
+    return 'admin' in user_roles
 
-    Parameters:
-        score (int): The score to validate.
+
+def format_username(username: str) -> str:
+    """
+    Format a username by stripping and lowering it.
+
+    Args:
+        username (str): The username to format.
 
     Returns:
-        bool: True if the score is valid, False otherwise.
-    """    
-    return 0 <= score <= 100
-
+        str: The formatted username.
+    """
+    return username.strip().lower()
