@@ -1,38 +1,30 @@
 import time
 import requests
-from functools import wraps
 
+class NetworkException(Exception):
+    pass
 
-def retry(max_attempts=3, delay=1):
-    """Decorator to retry a function upon exceptions."""
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            attempts = 0
-            while attempts < max_attempts:
-                try:
-                    return func(*args, **kwargs)
-                except (requests.exceptions.ConnectionError, 
-                        requests.exceptions.Timeout) as e:
-                    attempts += 1
-                    if attempts == max_attempts:
-                        raise e
-                    time.sleep(delay)
-        return wrapper
-    return decorator
+def retry_network_operation(func, max_retries=3, delay=2, *args, **kwargs):
+    attempts = 0
+    while attempts < max_retries:
+        try:
+            return func(*args, **kwargs)
+        except requests.exceptions.RequestException as e:
+            attempts += 1
+            if attempts == max_retries:
+                raise NetworkException(f'Operation failed after {max_retries} attempts') from e
+            time.sleep(delay)
 
+# Example network function that uses retry logic
 
-@retry(max_attempts=5, delay=2)
 def fetch_data(url):
-    """Fetch data from a given URL."""
     response = requests.get(url)
-    response.raise_for_status()  # Raise an error for bad responses
+    response.raise_for_status()  # Raise an error for HTTP errors
     return response.json()
 
 if __name__ == '__main__':
-    url = 'https://api.example.com/data'
     try:
-        data = fetch_data(url)
+        data = retry_network_operation(fetch_data, url='https://api.example.com/data')
         print(data)
-    except Exception as e:
-        print(f'Failed to fetch data: {e}')
+    except NetworkException as ne:
+        print(str(ne))
