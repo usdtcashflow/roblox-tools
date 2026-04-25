@@ -1,27 +1,39 @@
-from typing import List, Dict
+from typing import Any, Dict
 
 class RobloxUser:
+    """
+    A class representing a user in Roblox.
+    """
     def __init__(self, username: str, user_id: int) -> None:
-        self.username = username
-        self.user_id = user_id
+        """
+        Initializes the RobloxUser with a username and user ID.
+        :param username: The username of the Roblox user.
+        :param user_id: The unique ID of the Roblox user.
+        """
+        self.username: str = username
+        self.user_id: int = user_id
 
-    def __repr__(self) -> str:
-        return f'RobloxUser(username={self.username}, user_id={self.user_id})'
+    def to_dict(self) -> Dict[str, Any]:
+        """
+        Converts the RobloxUser instance to a dictionary.
+        :return: A dictionary representation of the RobloxUser instance.
+        """
+        return {
+            'username': self.username,
+            'user_id': self.user_id
+        }
 
-class Game:
-    def __init__(self, title: str, game_id: int, players: List[RobloxUser]) -> None:
-        self.title = title
-        self.game_id = game_id
-        self.players = players
+    @staticmethod
+    def from_dict(data: Dict[str, Any]) -> 'RobloxUser':
+        """
+        Creates a RobloxUser instance from a dictionary.
+        :param data: A dictionary containing user information.
+        :return: An instance of RobloxUser.
+        """
+        return RobloxUser(data['username'], data['user_id'])
 
-    def add_player(self, user: RobloxUser) -> None:
-        self.players.append(user)
-
-    def get_player_usernames(self) -> List[str]:
-        return [player.username for player in self.players]
-
-def find_game_with_most_players(games: List[Game]) -> Dict[str, int]:
-    if not games:
-        return {}
-    most_players_game = max(games, key=lambda g: len(g.players))
-    return {'title': most_players_game.title, 'player_count': len(most_players_game.players)}
+# Example Usage
+if __name__ == '__main__':
+    user_data = {'username': 'Player1', 'user_id': 123456}
+    user = RobloxUser.from_dict(user_data)
+    print(user.to_dict())
